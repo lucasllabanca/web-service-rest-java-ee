@@ -23,6 +23,7 @@
     <module>trabalho-web</module>
     <module>trabalho-api</module>
     <module>trabalho-impl</module>
+	<module>trabalho-mdb</module>
   </modules>
 
   <build>
@@ -40,6 +41,12 @@
 
   <dependencyManagement>
     <dependencies>
+		<dependency>
+			  <groupId>br.inatel.dm110</groupId>
+			  <artifactId>trabalho-mdb</artifactId>
+			  <version>1.0</version>
+			  <type>ejb</type>
+		</dependency>
 		<dependency>
 			  <groupId>br.inatel.dm110</groupId>
 			  <artifactId>trabalho-web</artifactId>
