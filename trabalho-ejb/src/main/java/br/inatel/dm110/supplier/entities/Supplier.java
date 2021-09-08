@@ -2,18 +2,25 @@ package br.inatel.dm110.supplier.entities;
 
 import java.io.Serializable;
 import java.security.Timestamp;
+import java.time.LocalDateTime;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "SUPPLIER", schema = "public")
 public class Supplier implements Serializable {
 
 	private static final long serialVersionUID = -5208296043391240977L;
 	
 	public Supplier() {}
 		
-	public Supplier(int id, String cnpj, String name, String email, String cep, Timestamp lastPurchase, int rating) {
+	public Supplier(String cnpj, String name, String email, String cep, LocalDateTime lastPurchase, int rating) {
 		super();
-		this.id = id;
 		this.cnpj = cnpj;
 		this.name = name;
 		this.email = email;
@@ -22,21 +29,27 @@ public class Supplier implements Serializable {
 		this.rating = rating;
 	}
 
-
-
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private int id;
 	
+	@Column(name = "cnpj")
 	private String cnpj;
 	
+	@Column(name = "name")
 	private String name;
 	
+	@Column(name = "email")
 	private String email;
 	
+	@Column(name = "cep")
 	private String cep;
 	
-	private Timestamp lastPurchase;
+	@Column(name = "lastPurchase")
+	private LocalDateTime lastPurchase;
 	
+	@Column(name = "rating")
 	private int rating;
 
 	public int getId() {
@@ -79,11 +92,11 @@ public class Supplier implements Serializable {
 		this.cep = cep;
 	}
 
-	public Timestamp getLastPurchase() {
+	public LocalDateTime getLastPurchase() {
 		return lastPurchase;
 	}
 
-	public void setLastPurchase(Timestamp lastPurchase) {
+	public void setLastPurchase(LocalDateTime lastPurchase) {
 		this.lastPurchase = lastPurchase;
 	}
 
