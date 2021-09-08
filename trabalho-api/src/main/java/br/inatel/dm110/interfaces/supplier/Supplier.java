@@ -14,6 +14,6 @@ public interface Supplier {
 	
 	List<SupplierTO> listSuppliers();
 	
-	String updateSupplier(SupplierTO supplier);
+	String updateSupplier(SupplierTO supplier, Integer id);
 
 }

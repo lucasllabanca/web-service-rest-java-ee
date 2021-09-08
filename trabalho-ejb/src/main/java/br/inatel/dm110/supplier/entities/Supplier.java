@@ -1,7 +1,6 @@
 package br.inatel.dm110.supplier.entities;
 
 import java.io.Serializable;
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -54,10 +53,6 @@ public class Supplier implements Serializable {
 
 	public int getId() {
 		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public String getCnpj() {

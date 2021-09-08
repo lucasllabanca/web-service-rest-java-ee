@@ -36,8 +36,8 @@ public class SupplierServiceImpl implements SupplierService {
 	}
 
 	@Override
-	public String updateSupplier(SupplierTO supplier) {
-		return supplierBean.updateSupplier(supplier);
+	public String updateSupplier(SupplierTO supplier, Integer id) {
+		return supplierBean.updateSupplier(supplier, id);
 	}
 
 }

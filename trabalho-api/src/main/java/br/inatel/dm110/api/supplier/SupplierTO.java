@@ -1,7 +1,6 @@
 package br.inatel.dm110.api.supplier;
 
 import java.io.Serializable;
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 
 public class SupplierTO implements Serializable {
@@ -15,6 +14,7 @@ public class SupplierTO implements Serializable {
 	private String cep;
 	private LocalDateTime lastPurchase;
 	private int rating;
+	
 	public int getId() {
 		return id;
 	}

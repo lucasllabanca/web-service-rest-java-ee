@@ -39,6 +39,6 @@ public interface SupplierService {
 	@Path("/supplier/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_HTML)
-	public String updateSupplier(SupplierTO supplier);
+	public String updateSupplier(SupplierTO supplier, @PathParam("id") Integer id);
 
 }

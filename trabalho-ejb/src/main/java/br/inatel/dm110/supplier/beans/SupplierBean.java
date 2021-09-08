@@ -28,9 +28,11 @@ public class SupplierBean implements SupplierLocal {
 		
 		try {
 			
-			Supplier supplier = new Supplier(s.getCnpj(), s.getName(), s.getEmail(), s.getCep(), s.getLastPurchase(), s.getRating()); 	
+			log.info("ADDING SUPPLIER: " + s.toString());
+					
+			Supplier supplier = new Supplier(s.getCnpj(), s.getName(), s.getEmail(), s.getCep(), s.getLastPurchase(), s.getRating()); 					
 			em.persist(supplier);
-			log.info("SAVING SUPPLIER: " + supplier.toString());
+								
 			return "SUPPLIER: " + supplier.getName() + " - CNPJ: " + supplier.getCnpj() + " saved successfully";
 			
 		} catch (Exception e) {
@@ -41,27 +43,91 @@ public class SupplierBean implements SupplierLocal {
 
 	@Override
 	public SupplierTO getSupplierById(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		log.info("GETTING SUPPLIER BY ID: " + id);
+			
+		TypedQuery<Supplier> query = em.createQuery("select s from Supplier s where s.id= :id", Supplier.class);
+		query.setParameter("id", id);
+		List<Supplier> supplierList = query.getResultList();
+		List<SupplierTO> supplierToList = toCollectionAPIModel(supplierList);
+			
+		if (supplierToList.isEmpty()) {
+			return null;
+		} else {
+			return supplierToList.get(0);
+		}
+					
 	}
 
 	@Override
 	public SupplierTO getSupplierByCnpj(String cnpj) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		log.info("GETTING SUPPLIER BY CNPJ: " + cnpj);
+		
+		if (cnpj.length() < 14) {
+			return null;
+		}
+
+		String cnpjFixed = cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12, 14);
+		
+		TypedQuery<Supplier> query = em.createQuery("select s from Supplier s where s.cnpj= :cnpj", Supplier.class);
+		query.setParameter("cnpj", cnpjFixed);
+		List<Supplier> supplierList = query.getResultList();
+		List<SupplierTO> supplierToList = toCollectionAPIModel(supplierList);
+			
+		if (supplierToList.isEmpty()) {
+			return null;
+		} else {
+			return supplierToList.get(0);
+		}
+		
 	}
 
 	@Override
 	public List<SupplierTO> listSuppliers() {
+		
+		log.info("GETTING LIST OF SUPPLIERS");
+		
 		TypedQuery<Supplier> query = em.createQuery("from Supplier s", Supplier.class);
-		List<Supplier> supplierList = query.getResultList();
-		return toCollectionAPIModel(supplierList); //converte de Entity para API
+		List<Supplier> supplierList = query.getResultList();		
+		
+		return toCollectionAPIModel(supplierList); //converte de Entity para API	
+		
 	}
 
 	@Override
-	public String updateSupplier(SupplierTO supplier) {
-		// TODO Auto-generated method stub
-		return null;
+	public String updateSupplier(SupplierTO s, Integer id) {
+		
+		try {
+			
+			log.info("UPDATING SUPPLIER: " + s.toString());
+			
+			Supplier supplier = em.find(Supplier.class, id);
+			
+			if (supplier == null) {
+				return null;
+			}
+			
+			if (s.getId() != id) {
+				return null;
+			}
+			
+			supplier.setCnpj(s.getCnpj());
+			supplier.setName(s.getName());
+			supplier.setEmail(s.getEmail());
+			supplier.setCep(s.getCep());
+			supplier.setLastPurchase(s.getLastPurchase());
+			supplier.setRating(s.getRating());
+			 
+			em.merge(supplier);
+			 
+			return "SUPPLIER: " + supplier.getName() + " - CNPJ: " + supplier.getCnpj() + " updated successfully";				
+			
+		} catch (Exception e) {
+			log.info("ERROR UPDATING SUPPLIER: " + e.getMessage());
+			return e.getMessage();
+		}
+		
 	}
 	
 	private List<SupplierTO> toCollectionAPIModel(List<Supplier> supplierList) {
