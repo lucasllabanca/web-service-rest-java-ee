@@ -107,6 +107,5 @@ public class Supplier implements Serializable {
 	public String toString() {
 		return "SupplierTO [id=" + id + ", cnpj=" + cnpj + ", name=" + name + ", email=" + email + ", cep=" + cep + ", lastPurchase=" + lastPurchase + ", rating=" + rating + "]";
 	}
-		
-
+	
 }

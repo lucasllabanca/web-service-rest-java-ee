@@ -4,8 +4,16 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.Session;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -18,7 +26,26 @@ import br.inatel.dm110.supplier.entities.Supplier;
 @Local(SupplierLocal.class)
 public class SupplierBean implements SupplierLocal {
 	
+	@Resource(lookup = "java:/ConnectionFactory")
+	private ConnectionFactory connectionFactory;
+	
+	@Resource(lookup = "java:/jms/queue/trabalhodm110queue")
+	private Queue queue;
+	
 	private static Logger log = Logger.getLogger(SupplierBean.class.getName());
+	
+	private void sendAuditingMessage(SupplierTO s) {
+		try {
+			Connection conn = connectionFactory.createConnection();
+			Session session = conn.createSession();
+			MessageProducer producer = session.createProducer(queue);
+			ObjectMessage msg = session.createObjectMessage(s);
+			producer.send(msg);
+			log.info("AUDITING MESSAGE SENT: " + s.toString());
+		} catch (JMSException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	@PersistenceContext(unitName = "trabalho_dm110_pu")
 	private EntityManager em;
@@ -32,7 +59,10 @@ public class SupplierBean implements SupplierLocal {
 					
 			Supplier supplier = new Supplier(s.getCnpj(), s.getName(), s.getEmail(), s.getCep(), s.getLastPurchase(), s.getRating()); 					
 			em.persist(supplier);
-								
+			
+			s.setId(0); //doing this to differentiate create from update
+			sendAuditingMessage(s);
+			
 			return "SUPPLIER: " + supplier.getName() + " - CNPJ: " + supplier.getCnpj() + " saved successfully";
 			
 		} catch (Exception e) {
@@ -102,15 +132,16 @@ public class SupplierBean implements SupplierLocal {
 			
 			log.info("UPDATING SUPPLIER: " + s.toString());
 			
+			if (s.getId() <= 0 || id <= 0)
+				return null;
+			
+			if (s.getId() != id)
+				return null;
+			
 			Supplier supplier = em.find(Supplier.class, id);
 			
-			if (supplier == null) {
+			if (supplier == null)
 				return null;
-			}
-			
-			if (s.getId() != id) {
-				return null;
-			}
 			
 			supplier.setCnpj(s.getCnpj());
 			supplier.setName(s.getName());
@@ -120,6 +151,8 @@ public class SupplierBean implements SupplierLocal {
 			supplier.setRating(s.getRating());
 			 
 			em.merge(supplier);
+			
+			sendAuditingMessage(s);
 			 
 			return "SUPPLIER: " + supplier.getName() + " - CNPJ: " + supplier.getCnpj() + " updated successfully";				
 			
